@@ -107,10 +107,14 @@ public class TextUi {
     }
 
     public void showTaggingChanges(TaggingList taggings) {
+        boolean tagChanged = false;
         for (Tagging tagging : taggings) {
             showToUser(tagging.toString());
+            tagChanged = true;
         }
-        showToUser(DIVIDER);
+        if (tagChanged) {
+            showToUser(DIVIDER);
+        }
     }
 
     public void showGoodbyeMessage() {

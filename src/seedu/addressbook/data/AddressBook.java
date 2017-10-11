@@ -12,6 +12,8 @@ import seedu.addressbook.data.person.UniquePersonList.DuplicatePersonException;
 import seedu.addressbook.data.person.UniquePersonList.PersonNotFoundException;
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
+import seedu.addressbook.data.taggings.Tagging;
+import seedu.addressbook.data.taggings.TaggingList;
 
 /**
  * Represents the entire address book. Contains the data of the address book.
@@ -24,6 +26,7 @@ public class AddressBook {
 
     private final UniquePersonList allPersons;
     private final UniqueTagList allTags; // can contain tags not attached to any person
+    private final TaggingList allTaggings; // list of all tag changes in this session
 
     /**
      * Creates an empty address book.
@@ -31,6 +34,7 @@ public class AddressBook {
     public AddressBook() {
         allPersons = new UniquePersonList();
         allTags = new UniqueTagList();
+        allTaggings = new TaggingList();
     }
 
     /**
@@ -43,6 +47,7 @@ public class AddressBook {
     public AddressBook(UniquePersonList persons, UniqueTagList tags) {
         this.allPersons = new UniquePersonList(persons);
         this.allTags = new UniqueTagList(tags);
+        this.allTaggings = new TaggingList();
         for (Person p : allPersons) {
             syncTagsWithMasterList(p);
         }
@@ -80,6 +85,7 @@ public class AddressBook {
      */
     public void addPerson(Person toAdd) throws DuplicatePersonException {
         allPersons.add(toAdd);
+        allTaggings.add(Tagging.TAGGING_ACTION_ADD, toAdd);
         syncTagsWithMasterList(toAdd);
     }
 
@@ -96,6 +102,7 @@ public class AddressBook {
      * @throws PersonNotFoundException if no such Person could be found.
      */
     public void removePerson(ReadOnlyPerson toRemove) throws PersonNotFoundException {
+        allTaggings.add(Tagging.TAGGING_ACTION_DELETE, toRemove);
         allPersons.remove(toRemove);
     }
 
@@ -103,6 +110,10 @@ public class AddressBook {
      * Clears all persons and tags from the address book.
      */
     public void clear() {
+        UniquePersonList personList = getAllPersons();
+        for (ReadOnlyPerson person : personList) {
+            allTaggings.add(Tagging.TAGGING_ACTION_DELETE, person);
+        }
         allPersons.clear();
         allTags.clear();
     }
@@ -119,6 +130,13 @@ public class AddressBook {
      */
     public UniqueTagList getAllTags() {
         return new UniqueTagList(allTags);
+    }
+
+    /**
+     * Returns a new TaggingList of all changes to tagging in addressbook at the time of the call.
+     */
+    public TaggingList getAllTaggings() {
+        return new TaggingList(allTaggings);
     }
 
     @Override

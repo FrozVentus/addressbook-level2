@@ -15,6 +15,8 @@ import java.util.Scanner;
 
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.data.taggings.Tagging;
+import seedu.addressbook.data.taggings.TaggingList;
 
 /**
  * Text UI of the application.
@@ -102,6 +104,13 @@ public class TextUi {
                 MESSAGE_PROGRAM_LAUNCH_ARGS_USAGE,
                 storageFileInfo,
                 DIVIDER);
+    }
+
+    public void showTaggingChanges(TaggingList taggings) {
+        for (Tagging tagging : taggings) {
+            showToUser(tagging.toString());
+        }
+        showToUser(DIVIDER);
     }
 
     public void showGoodbyeMessage() {
